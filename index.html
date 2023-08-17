@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/lanors.css">
+    <link rel="stylesheet" href="./css/kakaswitch.css">
+    <!-- <link rel="stylesheet" href="./assets/lib/fontawesome-free-5.15.4-web/css/all.min.css"> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.css">
+    <title>LanorS - 样式测试</title>
+    <script id="check-dark-light">
+        const enable = true
+            if (enable){
+            (()=>{
+                const e = localStorage.getItem("vitepress-theme-appearance") || ""
+                , a = window.matchMedia("(prefers-color-scheme: dark)").matches;
+                (!e || e === "auto" ? a : e === "dark") && document.documentElement.classList.add("dark")
+            }
+            )();
+        }
+    </script>
+</head>
+<body>
+    <div class="head">
+        <div class="title">
+            <h3 id="i_global_title">TwTords 天天背单词</h3>
+        </div>
+        <div class="key-hint">
+            <span id="i_global_keyhint">开始背单词吧！</span>
+        </div>
+    </div>
+    <div class="content" id="page1">
+        <div class="card"  style="height: calc(80vh - 180px); min-height: 595px;">
+            <div class="card-title">
+                <h3 id="i_settings_setting">设置</h3>
+            </div>
+            <div class="card-section">
+                <div class="section-text">
+                    
+                    <span id="i_settings_chooseWordList">请选择单词表</span></div>
+                <div class="section-input">
+                    <select name="WordList" id="conf_wordList">
+                        <option value="1">WordList1</option>
+                        <option value="2">WordList2</option>
+                        <option value="3">WordList3</option>
+                    </select>
+                </div>
+            </div>
+            <div class="card-section">
+                <div class="section-text">
+                    <span id="i_settings_oneRoundWords">一轮听写的单词总数</span></div>
+                <div class="section-input">
+                    <input type="number" name="total" id="conf_roundInp" value="20">
+                </div>
+            </div>
+            <div class="card-section">
+                <div class="section-text">
+                    <span id="i_settings_askingMode">听写模式</span>
+                </div>
+                <div class="section-input">
+                    <!-- radio -->
+                    <div class="radio">
+                        <input type="radio" name="method" id="eng2chi" checked>
+                        <label id="i_settings_eng2chi"for="eng2chi">英译中</label>
+                        <input type="radio" name="method" id="chi2eng" disabled>
+                        <label id="i_settings_chi2eng"for="chi2eng">中译英</label>
+                        <input type="radio" name="method" id="mixed" disabled>
+                        <label id="i_settings_mixed"for="mixed">混合模式</label>
+                    </div>
+                </div>
+            </div>
+            <div class="card-section">
+                <div class="section-text" id="i_settings_language">Language</div>
+                <div class="section-input" style="display: flex; justify-content: center; align-items: center;">
+                    (中) <input type="checkbox" id="langswitch" class="switch"> (EN)
+                </div>
+            </div>
+            <div class="card-section spacer">
+                <div class="section-text" id="i_settings_startR">开始按钮</div>
+                <div class="section-input" style="display: flex; justify-content: center; align-items: center;">
+                    <button id="i_settings_startB" class="startBTN">开始背单词</button>
+                </div>
+            </div>
+        </div>
+        <div class="action">            
+            <p id="i_settings_letsstart">如果你已经准备好了，<br>那就让我们开始吧！</p>
+            <br>
+            <br>
+            <span style="font-size: medium;" id="i_settings_clickLeftToStart">点击左侧按钮开始答题！</span>
+        </div>
+        <div class="display_result" style="display: none;">
+            <h3>测试结果</h3>
+            <p style="font-size: large;">
+                <span>本次考试一共 <span id="rep_totalNumber" style="font-weight: bold;">20</span> 道题目，</span>
+                <span>做对了 <span id="rep_rightNumber" style="font-weight: bold;">20</span> 道，做错了 <span id="rep_wrongNumber" style="font-weight: bold;">20</span> 道题目。</span><br>
+                <span>其中你完全没记住的单词是 “<span id="rep_notRemember" style="font-weight: bold;">A Word</span>”.</span>
+                <span>记得最清楚的单词之一是 “<span id="rep_rememberTheMost" style="font-weight: bold;">A Word</span>”.</span><br>
+                <span>这次测试超过了全球 <span id="rep_rank" style="font-weight: bold;">20</span>% 的用户！</span>
+            </p>
+        </div>
+
+    </div>
+
+    <div class="content" id="page2" style="display: none;height: calc(80vh - 180px); min-height: 595px;">
+        <div class="card"  style="margin: auto; width: 595px; padding: 40px; display: flex;">
+            <!-- <div style="color: #fff;">
+                选择的list：<span id="rep_needList"></span><br>
+                单词数量：<span id="rep_roundNum"></span><br>
+                模式：<span id="rep_mod"></span>
+            </div> -->
+            <h1 id="questionShow" style="font-size: 3rem;
+            line-height: 3rem;
+            text-align: center;
+            margin: auto;"></h1>
+            <input type="text" name="answer" placeholder="" style="margin-bottom: 10px;">
+            <!-- <button id="startBtn">开始</button> 添加一个新按钮 -->
+            <div class="section-input">
+                <button id="submitBtn" style="width: 100%;">提交</button> <!-- 原有的提交按钮 -->
+                <p id="result">结果反馈</p>
+            </div>
+        </div>
+        
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="./js/i18n.js"></script>
+    <script src="./js/main.js"></script>
+    <script src="./js/quest.js"></script>
+</body>
+</html>
