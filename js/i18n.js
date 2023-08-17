@@ -110,7 +110,7 @@ function refreshLanguage() {
 
 $(document).ready(function() {
     // 监听复选框点击事件
-    $('input[type="checkbox"]').change(function() {
+    $('input[type="checkbox"]#langswitch').change(function() {
         if ($(this).is(':checked')) {
             // 切换为英语
             currentLanguage = "en";
