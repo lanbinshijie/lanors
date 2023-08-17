@@ -1,4 +1,6 @@
 $(document).ready(function() {
+    // 正确阈值：准确度大于这个值就算正确
+    let correctThreshold = 0.6;
     let wordLists = []
     let EnableSkippedCooldown = true;
     let forceSkipped = false;
@@ -10,7 +12,7 @@ $(document).ready(function() {
     let theMostRemembered = "No Word";
     let theLeastRemembered = "No Word";
     let theMostRememberedCorrectRate = 0; // 相似度
-    let theLeastRememberedCorrectRate = 0;
+    let theLeastRememberedCorrectRate = 100;
     let wrongQuestions = [];
     let wrongQuestionsIndex = [];
     $.getJSON("./wordLists.json",
@@ -181,6 +183,7 @@ $(document).ready(function() {
         updateQuestions();
         let Skipped = false;
         let SkippedCooldown = 0;
+        let roundMode = 0; // 0为未选择，1为输入的是中文，需要用中文意思比较；2为输入的是英文，需要用英文比较
         $(document).keypress(function(e) {
             // 侦测是否按下Enter键
             if (e.which == 13 && SkippedCooldown <= 0) {
@@ -195,7 +198,26 @@ $(document).ready(function() {
         function updateQuestions() {
             // 根据wordIndex更新题目
             const word = wordListArr[wordIndex];
-            $("h1#questionShow").text(word);
+            let mixedMode = Math.random() < 0.5; // 小于0.5则为英译汉，大于0.5则为汉译英
+            $("h1#questionShow").fadeOut(300, function() {
+                // 判断是英译汉还是汉译英
+                if (TestMethod == 1) { // 英译汉
+                    roundMode = 1;
+                    $("h1#questionShow").text(word);
+                } else if (TestMethod == 2) { // 汉译英
+                    roundMode = 2;
+                    $("h1#questionShow").text(wordList[word]);
+                } else { // 混合模式
+                    if (mixedMode) {
+                        roundMode = 1;
+                        $("h1#questionShow").text(word);
+                    } else {
+                        roundMode = 2;
+                        $("h1#questionShow").text(wordList[word]);
+                    }
+                }
+                $("h1#questionShow").fadeIn(300);
+            });
             replaceText("i_global_keyhint", "跳过=Enter | Q"+(wordIndex+1)+". Total / "+TotalWordNum);
 
             // 清空输入框
@@ -206,7 +228,7 @@ $(document).ready(function() {
             } else if (TestMethod == 2) {
                 $("input[name='answer']").attr("placeholder", "请输入英文翻译");
             } else {
-                if (Math.random() < 0.5) {
+                if (mixedMode) {
                     $("input[name='answer']").attr("placeholder", "请输入中文翻译");
                 } else {
                     $("input[name='answer']").attr("placeholder", "请输入英文翻译");
@@ -231,13 +253,13 @@ $(document).ready(function() {
                 theLeastRemembered = word;
                 theLeastRememberedCorrectRate = similarity;
             }
-
-            if (TestMethod == 1) {
+            // word是英文，value是中文
+            if (TestMethod == 1) { // 英译汉
                 if (answer == value) {
                     return true;
                 }
             }
-            if (TestMethod == 2) {
+            if (TestMethod == 2) { // 汉译英
                 if (answer == word) {
                     return true;
                 }
@@ -254,6 +276,9 @@ $(document).ready(function() {
             // 更新结果，result是id=result的元素
             const result = $("p#result");
             const right = checkAnswer();
+            const answer = $("input[name='answer']").val();
+            const word = wordListArr[wordIndex];
+            const value = wordList[word];
             if (right == "Skip") {
                 if(SkippedCooldown > 0 && EnableSkippedCooldown) {
                     result.text("跳过冷却中，还有"+SkippedCooldown+"s");
@@ -268,11 +293,24 @@ $(document).ready(function() {
                 correctNum++;
                 result.text("回答正确！");
                 result.css("color", "green");
+            } else if (checkSimilarity(answer, value) >= correctThreshold) {
+                correctNum++;
+                if (roundMode == 1) {
+                    result.text("回答基本正确，标准答案为"+wordList[wordListArr[wordIndex]]+"。");
+                } else if (roundMode == 2) {
+                    result.text("回答基本正确，标准答案为"+wordListArr[wordIndex]+"。");
+                }
+                result.css("color", "#ffc559");
             } else {
                 wrongNum++;
                 wrongQuestions.push(wordListArr[wordIndex]);
                 wrongQuestionsIndex.push(wordIndex);
-                result.text("答案错误，正确答案为"+wordList[wordListArr[wordIndex]]+"。");
+                // 判断是要给出中文还是英文
+                if (roundMode == 1) {
+                    result.text("答案错误，正确答案为"+wordList[wordListArr[wordIndex]]+"。");
+                } else if (roundMode == 2) {
+                    result.text("答案错误，正确答案为"+wordListArr[wordIndex]+"。");
+                }
                 result.css("color", "red");
             }
             wordIndex++;
@@ -296,13 +334,27 @@ $(document).ready(function() {
                 doFireworks1();
                 doFireworks2();
                 doFireworks3();
+                function judgeRate() { // 判断排名
+                    if (correctRate >= 0.99) return "99.99";
+                    else if (correctRate >= 0.95) return "98";
+                    else if (correctRate >= 0.9) return "95";
+                    else if (correctRate >= 0.8) return "90";
+                    else if (correctRate >= 0.7) return "80";
+                    else if (correctRate >= 0.6) return "70";
+                    else if (correctRate >= 0.5) return "60";
+                    else if (correctRate >= 0.4) return "50";
+                    else if (correctRate >= 0.3) return "40";
+                    else if (correctRate >= 0.2) return "30";
+                    else if (correctRate >= 0.1) return "10";
+                    else return "0";
+                }
                 $("span#resultPageGo").click(function () {
                     $('#page2').fadeOut(1000, function() {
                         $('div.action').fadeOut(1);
                         $('#page1').fadeIn(1000);
                         $('div.display_result').fadeIn(1000);
                         // function pageResultReplace(totalNumber, rightNumber, wrongNumber, notRemember, rememberTheMost, rank) {
-                        pageResultReplace(TotalWordNum, correctNum, wrongNum+skippedNum, theMostRemembered, theLeastRemembered, "50.01");
+                        pageResultReplace(TotalWordNum, correctNum, wrongNum+skippedNum, theLeastRemembered, theMostRemembered, judgeRate());
                         console.log("page2 fade out");
                         // console.log(getTestInfo());
                     });
@@ -348,7 +400,12 @@ $(document).ready(function() {
         // let wordList;
         const TestInfo = getTestInfo();
         const TotalWordNum = TestInfo[1]; // 每轮测试的单词数
-        const TestMethod = 1 ? TestInfo[2] == "eng2chi" : (2 ? TestInfo[2] == "chi2eng" : 3); 
+        let TestMethod;
+        if (TestInfo[2] == "eng2chi") TestMethod = 1;
+        else if (TestInfo[2] == "chi2eng") TestMethod = 2;
+        else if (TestInfo[2] == "mixed") TestMethod = 3;
+        correctThreshold = TestInfo[3] ? 1.1 : 0.6;
+        console.log("TestMethod", TestMethod)
         let wordList;
         $.getJSON("./wordlists/Wordlist_1.json",
             function (data) {

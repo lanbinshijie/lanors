@@ -62,17 +62,23 @@
                     <div class="radio">
                         <input type="radio" name="method" id="eng2chi" checked>
                         <label id="i_settings_eng2chi"for="eng2chi">英译中</label>
-                        <input type="radio" name="method" id="chi2eng" disabled>
+                        <input type="radio" name="method" id="chi2eng">
                         <label id="i_settings_chi2eng"for="chi2eng">中译英</label>
-                        <input type="radio" name="method" id="mixed" disabled>
+                        <input type="radio" name="method" id="mixed">
                         <label id="i_settings_mixed"for="mixed">混合模式</label>
                     </div>
                 </div>
             </div>
             <div class="card-section">
+                <div class="section-text" id="">严格模式</div>
+                <div class="section-input" style="display: flex; justify-content: center; align-items: center;">
+                    (关) <input type="checkbox" id="conf_strict" class="switch" value="1"> (开)
+                </div>
+            </div>
+            <div class="card-section">
                 <div class="section-text" id="i_settings_language">Language</div>
                 <div class="section-input" style="display: flex; justify-content: center; align-items: center;">
-                    (中) <input type="checkbox" id="langswitch" class="switch"> (EN)
+                    (中) <input type="checkbox" id="langswitch" class="switch"> (英)
                 </div>
             </div>
             <div class="card-section spacer">

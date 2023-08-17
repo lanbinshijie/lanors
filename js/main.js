@@ -29,6 +29,7 @@ function getTestInfo() {
     // conf_wordList -> 选择的单词列表
     // conf_roundInp -> 一轮听写的单词总数
     // Name为method的radio -> 选择的测试方法
+    // conf_strict -> 是否严格模式
 
     // 返回一个array，包含以上三个值
     var wordList = document.getElementById("conf_wordList").value;
@@ -38,6 +39,8 @@ function getTestInfo() {
     var eng2chi = document.getElementById("eng2chi");
     var chi2eng = document.getElementById("chi2eng");
     var mixed = document.getElementById("mixed");
+    var strict = document.getElementById("conf_strict").checked;
+    console.log("stri",strict);
     if (eng2chi.checked) {
         methodValue = "eng2chi";
     } else if (chi2eng.checked) {
@@ -45,7 +48,7 @@ function getTestInfo() {
     } else if (mixed.checked) {
         methodValue = "mixed";
     }
-    var result = [wordList, roundInp, methodValue];
+    var result = [wordList, roundInp, methodValue, strict];
     return result;
 }
 
